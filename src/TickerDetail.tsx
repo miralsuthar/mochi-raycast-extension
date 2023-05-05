@@ -1,8 +1,12 @@
-import { Detail } from "@raycast/api";
+import { Detail, List } from "@raycast/api";
 import { useFetch } from "@raycast/utils";
 import { useEffect, useState } from "react";
 import { getChartColorConfig, imageUrlToBase64 } from "./util";
 import { TickerDetailType } from "./types";
+import { ChartConfiguration } from "chart.js";
+
+import { createImage } from "./chart";
+import { TagList } from "./components/Tags";
 
 export const TickerDetail = ({ id, interval }: { id: string; interval: number }) => {
   const [chartBase64, setChartBase64] = useState<string>("");
@@ -13,8 +17,7 @@ export const TickerDetail = ({ id, interval }: { id: string; interval: number })
 
   const { borderColor, gradientFrom } = getChartColorConfig(id);
 
-  console.log("data: ", data);
-  const chartConfig = {
+  const chartConfig: ChartConfiguration = {
     type: "line",
     data: {
       labels: data?.data?.times,
@@ -26,41 +29,16 @@ export const TickerDetail = ({ id, interval }: { id: string; interval: number })
           data: data?.data?.ratios as number[],
           label: `Price (USD) | ${data?.data.from} - ${data?.data.to}`,
           fill: "origin",
-          tension: 0.4,
+          lineTension: 0.4,
         },
       ],
-    },
-    options: {
-      scales: {
-        yAxes: {
-          // not 'yAxes: [{' anymore (not an array anymore)
-          ticks: {
-            color: "rgba(0,0,0,1)", // not 'fontColor:' anymore
-            // fontSize: 18,
-            font: {
-              size: 18, // 'size' now within object 'font {}'
-            },
-            stepSize: 1,
-          },
-        },
-        xAxes: {
-          // not 'xAxes: [{' anymore (not an array anymore)
-          ticks: {
-            color: "rgba(0,0,0,1)", // not 'fontColor:' anymore
-            //fontSize: 14,
-            font: {
-              size: 14, // 'size' now within object 'font {}'
-            },
-            stepSize: 1,
-          },
-        },
-      },
     },
   };
 
   const url = `https://image-charts.com/chart.js/2.8.0?bkg=rgba(13, 16, 24, 0.5)&c=${JSON.stringify(
     JSON.parse(JSON.stringify(chartConfig))
   )}`;
+  // const url = `https://quickchart.io/chart?c=${JSON.stringify(JSON.parse(JSON.stringify(chartConfig)))}`;
 
   useEffect(() => {
     imageUrlToBase64(url).then((res) => res !== null && setChartBase64(res));
@@ -84,17 +62,17 @@ export const TickerDetail = ({ id, interval }: { id: string; interval: number })
                 title="Current price"
                 text={`$${data?.data.base_coin.market_data.current_price.usd}`}
               />
-              <Detail.Metadata.Label
+              <TagList
+                value={data?.data?.base_coin.market_data?.price_change_percentage_1h_in_currency.usd as number}
                 title="Change(1h)"
-                text={`${data?.data.base_coin.market_data.price_change_percentage_1h_in_currency.usd}`}
               />
-              <Detail.Metadata.Label
+              <TagList
+                value={data?.data?.base_coin.market_data?.price_change_percentage_24h_in_currency.usd as number}
                 title="Change(24h)"
-                text={`${data?.data.base_coin.market_data.price_change_percentage_24h_in_currency.usd}`}
               />
-              <Detail.Metadata.Label
+              <TagList
+                value={data?.data?.base_coin.market_data?.price_change_percentage_7d_in_currency.usd as number}
                 title="Change(7d)"
-                text={`${data?.data.base_coin.market_data.price_change_percentage_7d_in_currency.usd}`}
               />
             </>
           )}
