@@ -5,7 +5,6 @@ import { getChartColorConfig, imageUrlToBase64 } from "./util";
 import { TickerDetailType } from "./types";
 import { ChartConfiguration } from "chart.js";
 
-import { createImage } from "./chart";
 import { TagList } from "./components/Tags";
 
 export const TickerDetail = ({ id, interval }: { id: string; interval: number }) => {
